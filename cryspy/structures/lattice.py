@@ -76,5 +76,4 @@ class CrystalLattice:
         for cell in self.lattice:
             for atom in cell:
                 pos = atom.get_position()
-                print(pos)
                 collection.append(pos, color=colors[atom.symbol], s=atom.size)
