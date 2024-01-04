@@ -37,11 +37,13 @@ class CrystalLattice:
                 dot(vectors.T, array([xidx[index], yidx[index], zidx[index]])) + origin
             )
             cell.set_origin(*position)
+            cell.place_atoms()
 
     def set_origin(self, vector: NDArray[double]) -> None:
         self.origin = vector
 
     def rotate_lattice(self, angle: float) -> None:
+        self.angle = angle
         rotation_matrix = array(
             [
                 [cos(angle), -sin(angle), 0],
@@ -51,6 +53,8 @@ class CrystalLattice:
         )
         for cell in self.lattice:
             cell.origin = rotation_matrix.dot(cell.origin)
+            cell.angle = angle
+            cell.place_atoms()
 
     def plot_lattice(
         self,
@@ -58,7 +62,6 @@ class CrystalLattice:
         colors: dict[str, tuple[float, float, float, float]],
     ) -> None:
         for cell in self.lattice:
-            cell.place_atoms()
             for atom in cell:
                 pos = atom.get_position()
                 collection.append(
@@ -71,9 +74,7 @@ class CrystalLattice:
         colors: dict[str, tuple[float, float, float, float]],
     ) -> None:
         for cell in self.lattice:
-            cell.place_atoms()
             for atom in cell:
                 pos = atom.get_position()
-                collection.append(
-                    pos, color=colors[atom.symbol], s=atom.size
-                )
+                print(pos)
+                collection.append(pos, color=colors[atom.symbol], s=atom.size)

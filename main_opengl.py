@@ -6,7 +6,16 @@ from cryspy.crystals.tungstendiselenide import (
 )
 
 from cryspy.structures.lattice import CrystalLattice
-from glumpy.api.matplotlib import Figure, PanZoom, LinearScale, PointCollection, Trackball, OrthographicProjection, IdentityProjection
+from cryspy.structures.specimen import Specimen
+from glumpy.api.matplotlib import (
+    Figure,
+    PanZoom,
+    LinearScale,
+    PointCollection,
+    Trackball,
+    OrthographicProjection,
+    IdentityProjection,
+)
 
 if __name__ == "__main__":
     colors = {
@@ -31,7 +40,6 @@ if __name__ == "__main__":
     lattice3.construct_lattice(wse2_vectors, (reps, reps, 2))
     lattice3.rotate_lattice(124.4 / 180 * np.pi)
 
-
     figure = Figure((24, 12))
     axis = figure.add_axes(
         aspect=1,
@@ -52,7 +60,9 @@ if __name__ == "__main__":
     # lattice1.plot_lattice_3d(collection, colors)
     # lattice2.plot_lattice_3d(collection, colors)
     # lattice3.plot_lattice_3d(collection, colors)
-    lattice1.plot_lattice(collection, colors)
-    lattice2.plot_lattice(collection, colors)
-    lattice3.plot_lattice(collection, colors)
-    figure.show()
+    # lattice1.plot_lattice(collection, colors)
+    # lattice2.plot_lattice(collection, colors)
+    # lattice3.plot_lattice(collection, colors)
+    # figure.show()
+    specimen = Specimen([lattice1, lattice2, lattice3])
+    print(specimen.point_mass_arrays())

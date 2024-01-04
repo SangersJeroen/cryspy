@@ -1,11 +1,13 @@
 from .atom import Atom
-from numpy import array
+from numpy import array, sin, cos
 from typing import Iterator
 
 
 class UnitCell:
     def __init__(self, atoms: list[Atom] | None) -> None:
         self.atoms = atoms
+        self.angle = 0
+        self.origin = array([0, 0, 0])
 
     def __repr__(self) -> str:
         return f"Origin: {self.origin}, Atoms: {self.atoms}"
@@ -29,4 +31,11 @@ class UnitCell:
         if self.atoms is None:
             raise ValueError("No atoms in unit cell")
         for atom in self.atoms:
-            atom.update_position(atom.position + self.origin)
+            rotation_matrix = array(
+                [
+                    [cos(self.angle), -sin(self.angle), 0],
+                    [sin(self.angle), cos(self.angle), 0],
+                    [0, 0, 1],
+                ]
+            )
+            atom.update_position(rotation_matrix.dot(atom.position) + self.origin)
