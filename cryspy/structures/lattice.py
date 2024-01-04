@@ -64,3 +64,16 @@ class CrystalLattice:
                 collection.append(
                     (*pos[:-1], 0), color=colors[atom.symbol], s=atom.size
                 )
+
+    def plot_lattice_3d(
+        self,
+        collection: AggPointCollection,
+        colors: dict[str, tuple[float, float, float, float]],
+    ) -> None:
+        for cell in self.lattice:
+            cell.place_atoms()
+            for atom in cell:
+                pos = atom.get_position()
+                collection.append(
+                    pos, color=colors[atom.symbol], s=atom.size
+                )
