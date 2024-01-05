@@ -13,7 +13,7 @@ SILICON5 = Atom("Silicon", "Si", 14, 1 / 4 * A, 3 / 4 * B, 3 / 4 * C)
 SILICON6 = Atom("Silicon", "Si", 14, 3 / 4 * A, 1 / 4 * B, 3 / 4 * C)
 SILICON7 = Atom("Silicon", "Si", 14, 3 / 4 * A, 3 / 4 * B, 1 / 4 * C)
 
-SILICON_UNIT_CELL: UnitCell = UnitCell(
+UNIT_CELL: UnitCell = UnitCell(
     [SILICON0, SILICON1, SILICON2, SILICON3, SILICON4, SILICON5, SILICON6, SILICON7]
 )
 

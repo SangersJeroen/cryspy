@@ -8,6 +8,7 @@ class UnitCell:
         self.atoms = atoms
         self.angle = 0
         self.origin = array([0, 0, 0])
+        self.atoms_placed = False
 
     def __repr__(self) -> str:
         return f"Origin: {self.origin}, Atoms: {self.atoms}"
