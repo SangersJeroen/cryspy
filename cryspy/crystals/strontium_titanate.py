@@ -12,7 +12,7 @@ OXYGEN2 = Atom("Oxygen", "O", 8, 1 / 2 * A, 0 * B, 1 / 2 * C, 3)
 
 UNIT_CELL: UnitCell = UnitCell([STRONTIUM, TITANIUM, OXYGEN0, OXYGEN1, OXYGEN2])
 
-CELL_VECTOR_A = array([A, 0, 0])
-CELL_VECTOR_B = array([0, B, 0])
-CELL_VECTOR_C = array([0, 0, C])
+CELL_VECTOR_A = array([A, 0, 0]) / 2
+CELL_VECTOR_B = array([0, B, 0]) / 2
+CELL_VECTOR_C = array([0, 0, C]) / 2
 LATTICE_VECTORS = stack([CELL_VECTOR_A, CELL_VECTOR_B, CELL_VECTOR_C])

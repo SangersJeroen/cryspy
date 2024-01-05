@@ -44,17 +44,8 @@ class CrystalLattice:
 
     def rotate_lattice(self, angle: float) -> None:
         self.angle = angle
-        rotation_matrix = array(
-            [
-                [cos(angle), -sin(angle), 0],
-                [sin(angle), cos(angle), 0],
-                [0, 0, 1],
-            ]
-        )
         for cell in self.lattice:
-            cell.origin = rotation_matrix.dot(cell.origin)
             cell.angle = angle
-            cell.place_atoms()
 
     def plot_lattice(
         self,
