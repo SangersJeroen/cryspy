@@ -4,6 +4,7 @@ from .atom import Atom
 from numpy._typing import NDArray
 from numpy import (
     vstack,
+    matrix,
     unique,
     identity,
     array,
@@ -152,7 +153,7 @@ class Specimen:
                         for row_idx in range(at_w.shape[0]):
                             row_dat = at_w[row_idx, :]
                             file.write(
-                                f"  {1.0000}  {row_dat[0]/xmax:.4f}  {row_dat[1]/ymax:.4f}\n"
+                                f"  {1.0000}  {row_dat[0]/xmax/2:.4f}  {row_dat[1]/ymax/2:.4f}\n"
                             )
                         file.write("\n")
                 print("\n")
@@ -219,7 +220,7 @@ class Specimen:
                     pos = dot(rotation, pos)
                     size = atom.size
                     color = colors[atom.symbol]
-                    atoms.append(pos, color=color, s=size)
+                    atoms.append((*pos[:-1], 0), color=color, s=size)
         figure.show()
 
 
