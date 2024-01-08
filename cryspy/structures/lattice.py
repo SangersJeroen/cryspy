@@ -1,8 +1,14 @@
 from .unit_cell import UnitCell
+from .atom import Atom
 from numpy._typing import NDArray
 from numpy import array, prod, dot, sin, cos, arange, meshgrid, double
 from copy import deepcopy
 from glumpy.graphics.collections.agg_point_collection import AggPointCollection
+
+
+Vector = tuple[float, float, float] | list[float] | NDArray[double]
+Position = tuple[float, float, float] | list[float] | NDArray[double]
+PointMassDict = dict[int, list[Position]]
 
 
 class CrystalLattice:
@@ -43,6 +49,26 @@ class CrystalLattice:
             cell.set_origin(*position)
         if construct:
             self._construct()
+
+    def point_mass_dict(self) -> PointMassDict:
+        self._atoms: list[Atom] = []
+        for unit_cell in self.lattice:
+            self._atoms.extend(unit_cell.atoms)
+        point_mass_positions: PointMassDict = {}
+        for atom in self._atoms:
+            if atom.number not in point_mass_positions:
+                point_mass_positions[atom.number] = []
+            point_mass_positions[atom.number].append(atom.position)
+
+        self._point_mass_dict = point_mass_positions
+        return point_mass_positions
+
+    def point_mass_arrays(self) -> dict[int, NDArray[double]]:
+        point_mass_arrays: dict[int, NDArray[double]] = {}
+        for number, positions in self.point_mass_dict().items():
+            point_mass_arrays[number] = array(positions)
+        self._point_mass_arrays = point_mass_arrays
+        return point_mass_arrays
 
     def _construct(self):
         if self._constructed is False:

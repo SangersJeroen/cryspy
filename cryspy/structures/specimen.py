@@ -1,7 +1,8 @@
 from .lattice import CrystalLattice
+import string
 from .atom import Atom
 from numpy._typing import NDArray
-from numpy import array, double, dot, matrix, identity
+from numpy import array, concatenate, double, dot, vstack, unique, newaxis
 import numpy.linalg as linalg
 from ..crystals.colors import colors
 
@@ -91,29 +92,15 @@ class Specimen:
         files that can be used as direct inputs to C. Kittel's* soft-
         ware.
 
-        It does this by slicing the model along the specified axis where
-        all atoms in the same layer are written to one layer file.
+        It does this by slicing the model along the z-axis where all
+        atoms in the same layer are written to one layer file.
 
         for multiple layers the files are named as:
                 `filename_stem[a-Z].dat`
-        """
-        extremes = self.find_ranges()
 
-        with open(filename, "w") as file:
-            file.write(
-                f"  {extremes[0]:.4f}  {extremes[1]:.4f}  {layer_thickness:.4f}\n"
-            )
-            file.write(" 0\n")
-            file.write("\n")
-            for atom_number in self._point_mass_arrays:
-                positions = self._point_mass_arrays[atom_number]
-                file.write(f"{atom_number}\n")
-                for position in positions:
-                    file.write(
-                        f"  {position[0]/extremes[0]:.4f}  {position[1]/extremes[1]:.4f}  {position[2]/extremes[2]:.4f}\n"
-                    )
-                file.write("\n")
-            file.write("\n")
+        eventually any axis
+        """
+        pass
 
     def plot_3d(self):
         figure = Figure()
