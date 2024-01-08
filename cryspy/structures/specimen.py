@@ -1,8 +1,10 @@
 from .lattice import CrystalLattice
+import string
 from .atom import Atom
 from numpy._typing import NDArray
 from numpy import (
     vstack,
+    unique,
     identity,
     array,
     double,
@@ -56,8 +58,9 @@ class Specimen:
                     datablock = vstack(
                         (datablock, array([*atom.position, atom.number, atom.size]))
                     )
-        self._datablock = datablock
-        return datablock
+
+        self._datablock = datablock[1:, :]
+        return datablock[1:, :]
 
     def repeating_feature(self):
         pass
@@ -106,7 +109,54 @@ class Specimen:
 
         eventually any axis
         """
-        pass
+        data = self.point_mass_arrays()
+        self.find_ranges()
+        xmax = self._extremes[0][1]
+        ymax = self._extremes[1][1]
+
+        unique_z = unique(data[:, 2])
+        unique_z.sort()
+
+        unique_w = unique(data[:, -2])
+        unique_w.sort()
+
+        slice_thicknesses: list[float] = []
+        for i, z in enumerate(unique_z):
+            if i + 1 == len(unique_z):
+                slice_thicknesses.append(z - unique_z[i - 1])
+            else:
+                slice_thicknesses.append(unique_z[i + 1] - z)
+
+        print(data)
+        print(unique_w, unique_z)
+        print("\n")
+        for i, (z, t) in enumerate(zip(unique_z, slice_thicknesses)):
+            letter = (list(string.ascii_lowercase) + list(string.ascii_uppercase))[i]
+            filename = filename_stem + letter + ".dat"
+
+            with open(filename, "w") as file:
+                file.write(
+                    f"  {self._extremes[0][1]:.4f}  {self._extremes[1][1]:.4f}  {t:.4f}\n"
+                )
+                file.write("0\n")
+
+                at_z = data[data[:, 2] == z]
+                print(f"at cooridinates {z}:\n", at_z)
+                for w in unique_w:
+                    at_w = at_z[at_z[:, -2] == w]
+                    print(f"with weight {w}:\n", at_w)
+                    if at_w.shape[0] != 0:
+                        file.write(
+                            f"{int(w)}\n"
+                        )  # TODO: Fix this, this should be atomic number...
+                        for row_idx in range(at_w.shape[0]):
+                            row_dat = at_w[row_idx, :]
+                            file.write(
+                                f"  {1.0000}  {row_dat[0]/xmax:.4f}  {row_dat[1]/ymax:.4f}\n"
+                            )
+                        file.write("\n")
+                print("\n")
+                file.write("\n\n")
 
     def plot_3d(self):
         figure = Figure()
