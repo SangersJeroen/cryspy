@@ -1,8 +1,15 @@
 from .lattice import CrystalLattice
-import string
 from .atom import Atom
 from numpy._typing import NDArray
-from numpy import array, concatenate, double, dot, vstack, unique, newaxis
+from numpy import (
+    vstack,
+    identity,
+    array,
+    double,
+    dot,
+    min as npmin,
+    max as npmax,
+)
 import numpy.linalg as linalg
 from ..crystals.colors import colors
 
@@ -21,9 +28,6 @@ from glumpy.api.matplotlib import (
 Vector = tuple[float, float, float] | list[float] | NDArray[double]
 Position = tuple[float, float, float] | list[float] | NDArray[double]
 PointMassDict = dict[int, list[Position]]
-
-regular = FontManager.get("OpenSans-Regular.ttf")
-bold = FontManager.get("OpenSans-Bold.ttf")
 
 
 class Specimen:
@@ -44,12 +48,16 @@ class Specimen:
         self._point_mass_dict = point_mass_positions
         return point_mass_positions
 
-    def point_mass_arrays(self) -> dict[int, NDArray[double]]:
-        point_mass_arrays: dict[int, NDArray[double]] = {}
-        for number, positions in self.point_mass_dict().items():
-            point_mass_arrays[number] = array(positions)
-        self._point_mass_arrays = point_mass_arrays
-        return point_mass_arrays
+    def point_mass_arrays(self) -> NDArray[double]:
+        datablock = array([0, 0, 0, 0, 0])
+        for crystal_lattice in self._constituent_structures:
+            for unit_cell in crystal_lattice.lattice:
+                for atom in unit_cell:
+                    datablock = vstack(
+                        (datablock, array([*atom.position, atom.number, atom.size]))
+                    )
+        self._datablock = datablock
+        return datablock
 
     def repeating_feature(self):
         pass
@@ -58,17 +66,15 @@ class Specimen:
         for lattice in self._constituent_structures:
             lattice._construct()
 
-    def find_ranges(self) -> tuple[float, float, float]:
-        xmax: float = 0.0
-        ymax: float = 0.0
-        zmax: float = 0.0
-
-        for atom in self.point_mass_arrays().values():
-            xmax = max(xmax, max(atom[:, 0]))
-            ymax = max(ymax, max(atom[:, 1]))
-            zmax = max(zmax, max(atom[:, 2]))
-        self._extremes = (xmax, ymax, zmax)
-        return (xmax, ymax, zmax)
+    def find_ranges(self) -> list[tuple[float, float]]:
+        minpos = npmin(self._datablock, axis=0)
+        maxpos = npmax(self._datablock, axis=0)
+        self._extremes = [
+            (minpos[0], maxpos[0]),
+            (minpos[1], maxpos[1]),
+            (minpos[2], maxpos[2]),
+        ]
+        return self._extremes
 
     def project_onto_plane(self, plane_vector_normal: Vector):
         unit_normal: Vector = array(plane_vector_normal)

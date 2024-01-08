@@ -19,4 +19,4 @@ if __name__ == "__main__":
     specimen.build_model()
     # specimen.plot_2d(view_axis=np.array([1, 1, 1]))
     arrs = specimen.point_mass_arrays()
-    specimen.export_point_mass_dict(filename_stem="wse2-")
+    print(arrs.shape)
