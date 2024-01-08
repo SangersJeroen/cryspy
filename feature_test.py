@@ -11,7 +11,7 @@ from cryspy.structures.specimen import Specimen
 
 if __name__ == "__main__":
     lattice1 = CrystalLattice(unit_cell)
-    lattice1.construct_lattice(vectors, (8, 8, 1))
+    lattice1.construct_lattice(vectors, (40, 40, 5))
 
     specimen = Specimen([lattice1])
     # specimen.export_point_mass_dict("test.dat")

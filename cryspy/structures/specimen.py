@@ -109,9 +109,9 @@ class Specimen:
             aspect=1,
             rect=(0, 0, 1, 1),
             interface=Trackball(name="trackball"),
-            zscale=LinearScale(domain=[0, 1], range=[-1 / 10, 1 / 10]),
-            xscale=LinearScale(domain=[0, 1], range=[-1 / 10, 1 / 10]),
-            yscale=LinearScale(domain=[0, 1], range=[-1 / 10, 1 / 10]),
+            zscale=LinearScale(domain=[0, 1], range=[-1 / 50, 1 / 50]),
+            xscale=LinearScale(domain=[0, 1], range=[-1 / 50, 1 / 50]),
+            yscale=LinearScale(domain=[0, 1], range=[-1 / 50, 1 / 50]),
             facecolor=(0, 0, 0, 1),
         )
         atoms = PointCollection(

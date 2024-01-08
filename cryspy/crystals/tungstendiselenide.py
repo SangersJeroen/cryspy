@@ -5,7 +5,7 @@ from ..structures.unit_cell import UnitCell
 
 A = 3.32
 B = 3.32
-C = 12.98
+C = 12.98 / 2
 
 TUNGSTEN = Atom("Tungsten", "W", 74, 1.660, 0.950, 0, 74)
 SELENIUM0 = Atom("Selenium", "Se", 14, 1.660, -0.980, 1.663, 0)
