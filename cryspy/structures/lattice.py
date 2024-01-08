@@ -9,9 +9,13 @@ class CrystalLattice:
     def __init__(self, unit_cell: UnitCell) -> None:
         self.unit_cell = unit_cell
         self.origin = None
+        self._constructed: bool = False
 
     def construct_lattice(
-        self, vectors: NDArray[double], repetitions: tuple[int, int, int]
+        self,
+        vectors: NDArray[double],
+        repetitions: tuple[int, int, int],
+        construct: bool = False,
     ) -> None:
         self.lattice = [deepcopy(self.unit_cell) for _ in range(prod(repetitions))]
 
@@ -37,7 +41,17 @@ class CrystalLattice:
                 dot(vectors.T, array([xidx[index], yidx[index], zidx[index]])) + origin
             )
             cell.set_origin(*position)
-            cell.place_atoms()
+        if construct:
+            self._construct()
+
+    def _construct(self):
+        if self._constructed is False:
+            for unit_cell in self.lattice:
+                unit_cell.place_atoms()
+                self._constructed = True
+                # print("Lattice constructed")
+        else:
+            print("Lattice already constructed")
 
     def set_origin(self, vector: NDArray[double]) -> None:
         self.origin = vector
