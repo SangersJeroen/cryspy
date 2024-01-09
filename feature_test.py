@@ -15,6 +15,8 @@ if __name__ == "__main__":
     lattice = CrystalLattice(unit_cell)
     lattice.construct_lattice(vectors, (50, 50, 1))
 
+    ranges: list[tuple[float, float]] = [(-10, 10), (-10, 10), (-10, 10)]
+
     latticeA = CrystalLattice(unit_cell)
     latticeA.set_origin(np.array([0, 0, C]))
     latticeA.construct_lattice(vectors, (50, 50, 1))
@@ -22,8 +24,10 @@ if __name__ == "__main__":
     specimen = Specimen([lattice, latticeA])
     # specimen.project_onto_plane((0, 0, 1))
     specimen.build_model()
-    # specimen.plot_3d()
+    specimen.plot_3d()
     specimen.plot_2d()
     arrs = specimen.point_mass_arrays()
-    print(arrs.shape)
-    specimen.export_point_mass_dict("wse")
+    specimen.export_point_mass_dict(
+        "wse",
+        extent=ranges,
+    )

@@ -31,6 +31,7 @@ from glumpy.api.matplotlib import (
 Vector = tuple[float, float, float] | list[float] | NDArray[double]
 Position = tuple[float, float, float] | list[float] | NDArray[double]
 PointMassDict = dict[int, list[Position]]
+Extent = list[tuple[float, float]]
 
 
 class Specimen:
@@ -96,7 +97,21 @@ class Specimen:
                     )
                     atom.update_position(new_pos)
 
-    def export_point_mass_dict(self, filename_stem: str):
+    def _limit_to_extend(self, extent: Extent) -> NDArray[double]:
+        if self._datablock is None:
+            data = self.point_mass_arrays()
+
+        data = self._datablock
+        xmin, xmax = extent[0]
+        ymin, ymax = extent[1]
+
+        xmask: NDArray[bool] = (data[:, 0] >= xmin) & (data[:, 0] <= xmax)
+        ymask: NDArray[bool] = (data[:, 1] >= ymin) & (data[:, 1] <= ymax)
+        mask: NDArray[bool] = xmask & ymask
+        data = data[mask]
+        return data
+
+    def export_point_mass_dict(self, filename_stem: str, extent: Extent | None = None):
         """export_point_mass_dict
         Function exports the model layers to a series of plain text .dat
         files that can be used as direct inputs to C. Kittel's* soft-
@@ -110,10 +125,15 @@ class Specimen:
 
         eventually any axis
         """
-        data = self.point_mass_arrays()
-        self.find_ranges()
-        xmax = self._extremes[0][1]
-        ymax = self._extremes[1][1]
+        if extent is None:
+            data: NDArray[double] = self.point_mass_arrays()
+            self.find_ranges()
+            _, xmax = self._extremes[0]
+            _, ymax = self._extremes[1]
+        else:
+            data = self._limit_to_extend(extent)
+            _, xmax = extent[0]
+            _, ymax = extent[1]
 
         unique_z = unique(data[:, 2])
         unique_z.sort()
@@ -128,24 +148,17 @@ class Specimen:
             else:
                 slice_thicknesses.append(unique_z[i + 1] - z)
 
-        print(data)
-        print(unique_w, unique_z)
-        print("\n")
         for i, (z, t) in enumerate(zip(unique_z, slice_thicknesses)):
             letter = (list(string.ascii_lowercase) + list(string.ascii_uppercase))[i]
             filename = filename_stem + letter + ".dat"
 
             with open(filename, "w") as file:
-                file.write(
-                    f"  {self._extremes[0][1]:.4f}  {self._extremes[1][1]:.4f}  {t:.4f}\n"
-                )
+                file.write(f"  {xmax:.4f}  {ymax:.4f}  {t:.4f}\n")
                 file.write("0\n")
 
                 at_z = data[data[:, 2] == z]
-                print(f"at cooridinates {z}:\n", at_z)
                 for w in unique_w:
                     at_w = at_z[at_z[:, -2] == w]
-                    print(f"with weight {w}:\n", at_w)
                     if at_w.shape[0] != 0:
                         file.write(
                             f"{int(w)}\n"
@@ -156,10 +169,9 @@ class Specimen:
                                 f"  {1.0000}  {row_dat[0]/xmax/2:.4f}  {row_dat[1]/ymax/2:.4f}\n"
                             )
                         file.write("\n")
-                print("\n")
                 file.write("\n\n")
 
-    def plot_3d(self):
+    def plot_3d(self, ranges: Extent | None = None):
         figure = Figure()
         axis = figure.add_axes(
             aspect=1,
@@ -177,17 +189,22 @@ class Specimen:
         )
         axis.add_drawable(atoms)
 
-        self.build_model()
-        for lattice in self._constituent_structures:
-            for unit_cell in lattice.lattice:
-                for atom in unit_cell.atoms:
-                    pos = atom.get_position()
-                    size = atom.size
-                    color = colors[atom.symbol]
-                    atoms.append(pos, color=color, s=size)
+        if self._datablock is None:
+            datablock = self._datablock
+        else:
+            datablock = self.point_mass_arrays()
+
+        if ranges is not None:
+            datablock = self._limit_to_extend(extent=ranges)
+
+        for idx in range(datablock.shape[0]):
+            pos = datablock[idx, :2]
+            size = datablock[idx, -1]
+            color = colors[datablock[idx, -2]]
+            atoms.append(pos, color=color, s=size)
         figure.show()
 
-    def plot_2d(self, view_axis: Vector = None):
+    def plot_2d(self, view_axis: Vector = None, ranges: Extent | None = None):
         figure = Figure()
         axis = figure.add_axes(
             aspect=1,
@@ -209,18 +226,22 @@ class Specimen:
             vec1, vec2 = array([-1, 2, 1]), array([2, -1, -1])
             vectors = [view_axis, vec1, vec2]
             orth_basis = matrix(gram_schmidt(vectors))
-            print(orth_basis)
             rotation = linalg.inv(orth_basis)
 
-        self.build_model()
-        for lattice in self._constituent_structures:
-            for unit_cell in lattice.lattice:
-                for atom in unit_cell.atoms:
-                    pos = atom.get_position()
-                    pos = dot(rotation, pos)
-                    size = atom.size
-                    color = colors[atom.symbol]
-                    atoms.append((*pos[:-1], 0), color=color, s=size)
+        if self._datablock is None:
+            datablock = self._datablock
+        else:
+            datablock = self.point_mass_arrays()
+
+        if ranges is not None:
+            datablock = self._limit_to_extend(extent=ranges)
+
+        for idx in range(datablock.shape[0]):
+            pos = datablock[idx, :2]
+            pos = dot(rotation, pos)
+            size = datablock[idx, -1]
+            color = colors[datablock[idx, -2]]
+            atoms.append((*pos[:-1], 0), color=color, s=size)
         figure.show()
 
 
