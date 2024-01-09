@@ -25,7 +25,7 @@ if __name__ == "__main__":
     specimen = Specimen([lattice, latticeA])
     # specimen.project_onto_plane((0, 0, 1))
     specimen.build_model()
-    specimen.plot_3d()
+    specimen.plot_3d(perf=True)
     specimen.plot_2d(ranges=ranges)
     arrs = specimen.point_mass_arrays()
     specimen.export_to_xyzfile(

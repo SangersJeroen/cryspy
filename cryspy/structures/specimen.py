@@ -4,6 +4,7 @@ from .atom import Atom
 from numpy._typing import NDArray
 from numpy import (
     vstack,
+    asarray,
     matrix,
     unique,
     identity,
@@ -188,14 +189,19 @@ class Specimen:
         if extent is None:
             data: NDArray[double] = self.point_mass_arrays()
             self.find_ranges()
-            _, xmax = self._extremes[0]
-            _, ymax = self._extremes[1]
-            _, zmax = self._extremes[2]
+            xmin, xmax = self._extremes[0]
+            ymin, ymax = self._extremes[1]
+            zmin, zmax = self._extremes[2]
         else:
             data = self._limit_to_extend(extent)
-            _, xmax = extent[0]
-            _, ymax = extent[1]
-            _, zmax = extent[2]
+            xmin, xmax = extent[0]
+            ymin, ymax = extent[1]
+            zmin, zmax = extent[2]
+
+        print("exporting specimen")
+        print(f"xmin, xmax: ({xmin:.3f},{xmax:.3f}")
+        print(f"ymin, ymax: ({ymin:.3f},{ymax:.3f}")
+        print(f"zmin, zmax: ({zmin:.3f},{zmax:.3f}")
 
         with open(filename + ".xyz", "w") as file:
             file.write("-- boop boop beep ---\n")
@@ -206,6 +212,7 @@ class Specimen:
                     f"{int(znum)}\t{posx:.4f}\t{posy:.4f}\t{posz:.4f}\t1.000\t0.000\n"
                 )
             file.write("-1")
+        print(f"{data.shape[0]} atoms exported")
 
     def plot_3d(self, ranges: Extent | None = None):
         figure = Figure()
@@ -258,11 +265,13 @@ class Specimen:
         axis.add_drawable(atoms)
 
         rotation = identity(3)
+        view_axis = None
         if view_axis is not None:
-            vec1, vec2 = array([-1, 2, 1]), array([2, -1, -1])
+            vec1, vec2 = array([1, 2, 3]), array([3, 2, 1])
             vectors = [view_axis, vec1, vec2]
             orth_basis = matrix(gram_schmidt(vectors))
             rotation = linalg.inv(orth_basis)
+            print(rotation)
 
         if hasattr(self, "_datablock"):
             datablock = self._datablock
@@ -274,10 +283,10 @@ class Specimen:
 
         for idx in range(datablock.shape[0]):
             pos = datablock[idx, :3]
-            pos = dot(rotation, pos)
+            pos = asarray(dot(rotation, pos))
             size = datablock[idx, -1]
             color = colors[str(int(datablock[idx, -2]))]
-            atoms.append((*pos[:-1], 0), color=color, s=size)
+            atoms.append((pos[0], pos[1], 0), color=color, s=size)
         figure.show()
 
 
