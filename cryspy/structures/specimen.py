@@ -111,7 +111,7 @@ class Specimen:
         data = data[mask]
         return data
 
-    def export_point_mass_dict(self, filename_stem: str, extent: Extent | None = None):
+    def export_to_datfiles(self, filename_stem: str, extent: Extent | None = None):
         """export_point_mass_dict
         Function exports the model layers to a series of plain text .dat
         files that can be used as direct inputs to C. Kittel's* soft-
@@ -171,6 +171,42 @@ class Specimen:
                         file.write("\n")
                 file.write("\n\n")
 
+    def export_to_xyzfile(self, filename: str, extent: Extent | None = None):
+        """export_point_mass_dict
+        Function exports the model layers to a series of plain text .dat
+        files that can be used as direct inputs to C. Kittel's* soft-
+        ware.
+
+        It does this by slicing the model along the z-axis where all
+        atoms in the same layer are written to one layer file.
+
+        for multiple layers the files are named as:
+                `filename_stem[a-Z].dat`
+
+        eventually any axis
+        """
+        if extent is None:
+            data: NDArray[double] = self.point_mass_arrays()
+            self.find_ranges()
+            _, xmax = self._extremes[0]
+            _, ymax = self._extremes[1]
+            _, zmax = self._extremes[2]
+        else:
+            data = self._limit_to_extend(extent)
+            _, xmax = extent[0]
+            _, ymax = extent[1]
+            _, zmax = extent[2]
+
+        with open(filename + ".xyz", "w") as file:
+            file.write("-- boop boop beep ---\n")
+            file.write(f"\t{xmax:.4f}\t{ymax:.4f}\t{zmax:.4f}\n")
+            for row_idx in range(data.shape[0]):
+                posx, posy, posz, znum, _ = data[row_idx]
+                file.write(
+                    f"{int(znum)}\t{posx:.4f}\t{posy:.4f}\t{posz:.4f}\t1.000\t0.000\n"
+                )
+            file.write("-1")
+
     def plot_3d(self, ranges: Extent | None = None):
         figure = Figure()
         axis = figure.add_axes(
@@ -189,7 +225,7 @@ class Specimen:
         )
         axis.add_drawable(atoms)
 
-        if self._datablock is None:
+        if hasattr(self, "_datablock"):
             datablock = self._datablock
         else:
             datablock = self.point_mass_arrays()
@@ -198,9 +234,9 @@ class Specimen:
             datablock = self._limit_to_extend(extent=ranges)
 
         for idx in range(datablock.shape[0]):
-            pos = datablock[idx, :2]
+            pos = datablock[idx, :3]
             size = datablock[idx, -1]
-            color = colors[datablock[idx, -2]]
+            color = colors[str(int(datablock[idx, -2]))]
             atoms.append(pos, color=color, s=size)
         figure.show()
 
@@ -228,7 +264,7 @@ class Specimen:
             orth_basis = matrix(gram_schmidt(vectors))
             rotation = linalg.inv(orth_basis)
 
-        if self._datablock is None:
+        if hasattr(self, "_datablock"):
             datablock = self._datablock
         else:
             datablock = self.point_mass_arrays()
@@ -237,10 +273,10 @@ class Specimen:
             datablock = self._limit_to_extend(extent=ranges)
 
         for idx in range(datablock.shape[0]):
-            pos = datablock[idx, :2]
+            pos = datablock[idx, :3]
             pos = dot(rotation, pos)
             size = datablock[idx, -1]
-            color = colors[datablock[idx, -2]]
+            color = colors[str(int(datablock[idx, -2]))]
             atoms.append((*pos[:-1], 0), color=color, s=size)
         figure.show()
 
