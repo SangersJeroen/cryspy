@@ -8,8 +8,8 @@ B = 3.32
 C = 12.98 / 2
 
 TUNGSTEN = Atom("Tungsten", "W", 74, 1.660, 0.950, 0, 74)
-SELENIUM0 = Atom("Selenium", "Se", 14, 1.660, -0.980, 1.663, 0)
-SELENIUM1 = Atom("Selenium", "Se", 14, 1.660, -0.980, -1.663, 0)
+SELENIUM0 = Atom("Selenium", "Se", 34, 1.660, -0.980, 1.663, 0)
+SELENIUM1 = Atom("Selenium", "Se", 34, 1.660, -0.980, -1.663, 0)
 
 UNIT_CELL: UnitCell = UnitCell([TUNGSTEN, SELENIUM0, SELENIUM1])
 LATTICE_VECTORS = stack(
