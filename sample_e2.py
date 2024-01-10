@@ -13,8 +13,7 @@ from cryspy.structures.lattice import CrystalLattice
 from cryspy.structures.specimen import Specimen
 
 ranges = [(0, 80), (0, 80), (0, 80)]
-ranges = None
-reps = 90
+reps = 110
 
 
 if __name__ == "__main__":

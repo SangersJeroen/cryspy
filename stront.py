@@ -18,4 +18,5 @@ if __name__ == "__main__":
     specimen = Specimen([latticeA])
     specimen.build_model()
     specimen.plot_3d()
+    # specimen.project_onto_plane(np.array([0, 1, 1]))
     specimen.plot_2d(view_axis=np.array([1, 0, 0]))

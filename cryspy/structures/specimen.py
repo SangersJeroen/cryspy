@@ -97,6 +97,7 @@ class Specimen:
                         * unit_normal
                     )
                     atom.update_position(new_pos)
+        self.point_mass_arrays()
 
     def _limit_to_extend(self, extent: Extent) -> NDArray[double]:
         if self._datablock is None:
@@ -109,8 +110,7 @@ class Specimen:
         xmask: NDArray[bool] = (data[:, 0] >= xmin) & (data[:, 0] <= xmax)
         ymask: NDArray[bool] = (data[:, 1] >= ymin) & (data[:, 1] <= ymax)
         mask: NDArray[bool] = xmask & ymask
-        data = data[mask]
-        return data
+        return data[mask]
 
     def export_to_datfiles(self, filename_stem: str, extent: Extent | None = None):
         """export_point_mass_dict
@@ -265,13 +265,11 @@ class Specimen:
         axis.add_drawable(atoms)
 
         rotation = identity(3)
-        view_axis = None
         if view_axis is not None:
-            vec1, vec2 = array([1, 2, 3]), array([3, 2, 1])
+            vec1, vec2 = array([17, 2, 5]), array([7, 11, 13])
             vectors = [view_axis, vec1, vec2]
-            orth_basis = matrix(gram_schmidt(vectors))
+            orth_basis = asarray(gram_schmidt(vectors))
             rotation = linalg.inv(orth_basis)
-            print(rotation)
 
         if hasattr(self, "_datablock"):
             datablock = self._datablock

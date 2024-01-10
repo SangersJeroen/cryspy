@@ -12,10 +12,11 @@ from cryspy.structures.specimen import Specimen
 
 if __name__ == "__main__":
     latticeA = CrystalLattice(unit_cell)
-    latticeA.construct_lattice(vectors, (10, 10, 10))
-    latticeA.rotate_lattice(123.7 / 180 * np.pi)
+    latticeA.construct_lattice(vectors, (2, 2, 1))
 
     specimen = Specimen([latticeA])
     specimen.build_model()
     specimen.plot_3d()
-    specimen.plot_2d(view_axis=np.array([1, 1, 1]))
+    specimen.project_onto_plane(np.array([1, 1, 0]))
+    # specimen.plot_2d(view_axis=np.array([1, 1, 1]))
+    specimen.plot_2d()
