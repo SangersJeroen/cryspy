@@ -5,7 +5,7 @@ from numpy._typing import NDArray
 from numpy import (
     vstack,
     asarray,
-    matrix,
+    empty,
     unique,
     identity,
     array,
@@ -54,16 +54,18 @@ class Specimen:
         return point_mass_positions
 
     def point_mass_arrays(self) -> NDArray[double]:
-        datablock = array([0, 0, 0, 0, 0])
+        rows = 0
+        for crystal_lattice in self._constituent_structures:
+            rows += len(crystal_lattice.unit_cell.atoms) * len(crystal_lattice.lattice)
+        datablock = empty((rows, 5))
+        s = 0
         for crystal_lattice in self._constituent_structures:
             for unit_cell in crystal_lattice.lattice:
                 for atom in unit_cell:
-                    datablock = vstack(
-                        (datablock, array([*atom.position, atom.number, atom.size]))
-                    )
-
-        self._datablock = datablock[1:, :]
-        return datablock[1:, :]
+                    datablock[s, :] = array([*atom.position, atom.number, atom.size])
+                    s += 1
+        self._datablock = datablock
+        return datablock
 
     def repeating_feature(self):
         pass
@@ -186,8 +188,9 @@ class Specimen:
 
         eventually any axis
         """
+        data = self.point_mass_arrays()
+
         if extent is None:
-            data: NDArray[double] = self.point_mass_arrays()
             self.find_ranges()
             xmin, xmax = self._extremes[0]
             ymin, ymax = self._extremes[1]
@@ -199,6 +202,7 @@ class Specimen:
             zmin, zmax = extent[2]
 
         print("exporting specimen")
+        print(data.shape)
         print(f"xmin, xmax: ({xmin:.3f},{xmax:.3f}")
         print(f"ymin, ymax: ({ymin:.3f},{ymax:.3f}")
         print(f"zmin, zmax: ({zmin:.3f},{zmax:.3f}")
