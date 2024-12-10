@@ -96,7 +96,7 @@ class CrystalLattice:
             for atom in cell:
                 pos = atom.get_position()
                 collection.append(
-                    (*pos[:-1], 0), color=colors[atom.symbol], s=atom.size
+                    (*pos[:-1], 0), color=colors[str(atom.number)], s=atom.size
                 )
 
     def plot_lattice_3d(

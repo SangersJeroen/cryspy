@@ -1,0 +1,23 @@
+Lattices initiated in 0.10 seconds
+         600007 function calls in 0.554 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    60000    0.364    0.000    0.544    0.000 unit_cell.py:30(place_atoms)
+   180000    0.121    0.000    0.121    0.000 {built-in method numpy.array}
+   180000    0.046    0.000    0.046    0.000 {method 'dot' of 'numpy.ndarray' objects}
+   180000    0.014    0.000    0.014    0.000 atom.py:25(update_position)
+        3    0.009    0.003    0.554    0.185 lattice.py:74(_construct)
+        1    0.000    0.000    0.554    0.554 {built-in method builtins.exec}
+        1    0.000    0.000    0.554    0.554 specimen.py:73(build_model)
+        1    0.000    0.000    0.554    0.554 <string>:1(<module>)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+Specimen build in 0.56 seconds
+exporting specimen
+xmin, xmax: (-120.584,-118.913
+ymin, ymax: (-72.963,-71.998
+zmin, zmax: (2531098.337,2531101.663
+180000 atoms exported

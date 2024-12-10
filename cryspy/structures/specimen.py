@@ -174,7 +174,7 @@ class Specimen:
                         file.write("\n")
                 file.write("\n\n")
 
-    def export_to_xyzfile(self, filename: str, extent: Extent | None = None):
+    def export_to_xyzfile_temsim(self, filename: str, extent: Extent | None = None):
         """export_point_mass_dict
         Function exports the model layers to a series of plain text .dat
         files that can be used as direct inputs to C. Kittel's* soft-
@@ -216,6 +216,33 @@ class Specimen:
                     f"{int(znum)}\t{posx:.4f}\t{posy:.4f}\t{posz:.4f}\t1.000\t0.000\n"
                 )
             file.write("-1")
+        print(f"{data.shape[0]} atoms exported")
+
+    def export_to_xyzfile_blender(self, filename: str, extent: Extent | None = None):
+        """export_point_mass_dict
+        Function exports the model layers to a series of plain text .dat
+        files that can be used as direct inputs to C. Kittel's* soft-
+        ware.
+
+        It does this by slicing the model along the z-axis where all
+        atoms in the same layer are written to one layer file.
+
+        for multiple layers the files are named as:
+                `filename_stem[a-Z].dat`
+
+        eventually any axis
+        """
+        data = self.point_mass_arrays()
+        num_atoms = data.shape[0]
+
+        with open(filename + ".xyz", "w") as file:
+            file.write(f"{num_atoms}\n\n")
+            for lattice in self._constituent_structures:
+                for ucell in lattice.lattice:
+                    for atom in ucell.atoms:
+                        file.write(
+                            f"{atom.symbol}\t{atom.get_position()[0]:.4f}\t{atom.get_position()[1]:.4f}\t{atom.get_position()[2]:.4f}\n"
+                        )
         print(f"{data.shape[0]} atoms exported")
 
     def plot_3d(self, ranges: Extent | None = None):
